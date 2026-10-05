@@ -36,10 +36,10 @@ Endpoints: `/` (UI), `/api/tasks` (REST: GET, POST, GET/PUT/DELETE `/{id}`), `/h
 | `ARTIFACT_BUCKET` | `module-6-dev-artifacts-615299752577-eu-north-1` |
 | `TASK_EXECUTION_ROLE_ARN` | `arn:aws:iam::615299752577:role/module-6-dev-ecs-execution-role` |
 | `TASK_ROLE_ARN` | `arn:aws:iam::615299752577:role/module-6-dev-ecs-task-role` |
-| `DB_PROXY_ENDPOINT` | output `DbProxyEndpoint` of stack `module-6-data` |
+| `DB_PROXY_ENDPOINT` | `module-6-dev-proxy.proxy-c96sacsq4cs3.eu-north-1.rds.amazonaws.com` |
 | `DB_NAME` / `DB_USER` | `module6` / `module6admin` |
-| `REDIS_ENDPOINT` | output `RedisPrimaryEndpoint` of stack `module-6-data` |
-| `REDIS_SECRET_ARN` | output `RedisAuthSecretArn` of stack `module-6-data` |
+| `REDIS_ENDPOINT` | `master.module-6-dev-redis.9zfvrc.eun1.cache.amazonaws.com` |
+| `REDIS_SECRET_ARN` | `arn:aws:secretsmanager:eu-north-1:615299752577:secret:module-6/dev/redis-auth-B0vNOb` |
 
 None of these are secrets. They are identifiers, so they are stored as variables.
 
