@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 6 Tasks</title>
+  <style>
+    :root { --bg:#f4f6f8; --card:#fff; --ink:#1d2733; --muted:#6b7785; --line:#e3e7eb;
+            --accent:#ff9900; --ok:#1f8a4c; --db:#2563eb; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:var(--bg); color:var(--ink); }
+    main { max-width: 760px; margin: 32px auto; padding: 0 16px; }
+    h1 { margin: 0 0 4px; font-size: 1.6rem; }
+    .sub { color: var(--muted); margin: 0 0 20px; font-size: .9rem; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+    .badge { display:inline-block; padding:3px 10px; border-radius:999px; color:#fff; font-weight:600; font-size:.8rem; }
+    .redis { background: #d82c20; } .rds { background: var(--db); }
+    form.add { display:flex; gap:8px; }
+    input[type=text] { flex:1; padding:9px 10px; border:1px solid var(--line); border-radius:6px; font-size:1rem; min-width:0; }
+    button { padding:8px 12px; border:1px solid var(--line); border-radius:6px; background:#fff; cursor:pointer; }
+    button.primary { background: var(--accent); border-color: var(--accent); color:#111; font-weight:600; }
+    button.danger { color:#b42318; }
+    ul { list-style:none; margin:0; padding:0; }
+    li { display:flex; align-items:center; gap:8px; padding:10px 0; border-bottom:1px solid var(--line); flex-wrap: wrap; }
+    li:last-child { border-bottom:0; }
+    li form { margin:0; }
+    li form.edit { display:flex; gap:6px; flex:1; min-width: 200px; }
+    .done input[type=text] { text-decoration: line-through; color: var(--muted); }
+    .error { color:#b42318; margin: 0 0 12px; }
+    .meta { color: var(--muted); font-size:.8rem; }
+    .empty { color: var(--muted); text-align:center; padding: 20px 0; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Module 6 Task Board</h1>
+  <p class="sub">ECS Fargate &middot; RDS PostgreSQL via RDS Proxy &middot; ElastiCache Redis</p>
+
+  <div class="card">
+    Last list read served from
+    <span th:class="${source == 'REDIS'} ? 'badge redis' : 'badge rds'"
+          th:text="${source == 'REDIS'} ? 'Redis cache (hit)' : 'RDS via RDS Proxy (cache miss)'">source</span>
+    in <strong th:text="${elapsed} + ' ms'">0 ms</strong>.
+    <div class="meta">Refresh to read from cache; any write evicts it so the next read goes to RDS.</div>
+  </div>
+
+  <div class="card">
+    <p class="error" th:if="${error}" th:text="${error}"></p>
+    <form class="add" th:action="@{/tasks}" method="post">
+      <input type="text" name="title" maxlength="200" placeholder="What needs doing?" required>
+      <button class="primary" type="submit">Add task</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <ul>
+      <li th:each="t : ${tasks}" th:classappend="${t.completed} ? 'done'">
+        <form th:action="@{/tasks/{id}/toggle(id=${t.id})}" method="post">
+          <button type="submit" th:text="${t.completed} ? 'Undo' : 'Done'"
+                  th:title="${t.completed} ? 'Mark as open' : 'Mark as done'">Done</button>
+        </form>
+        <form class="edit" th:action="@{/tasks/{id}/update(id=${t.id})}" method="post">
+          <input type="text" name="title" maxlength="200" th:value="${t.title}" required>
+          <button type="submit">Save</button>
+        </form>
+        <form th:action="@{/tasks/{id}/delete(id=${t.id})}" method="post">
+          <button class="danger" type="submit">Delete</button>
+        </form>
+      </li>
+      <li class="empty" th:if="${#lists.isEmpty(tasks)}">No tasks yet - add one above.</li>
+    </ul>
+  </div>
+
+  <p class="meta">Served by task <code th:text="${app.host}">host</code>,
+    image <code th:text="${app.shortVersion}">version</code></p>
+</main>
+</body>
+</html>

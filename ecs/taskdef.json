@@ -1,0 +1,47 @@
+{
+  "family": "module-6-dev-app",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "runtimePlatform": { "cpuArchitecture": "X86_64", "operatingSystemFamily": "LINUX" },
+  "executionRoleArn": "${TASK_EXECUTION_ROLE_ARN}",
+  "taskRoleArn": "${TASK_ROLE_ARN}",
+  "containerDefinitions": [
+    {
+      "name": "app",
+      "image": "<IMAGE1_NAME>",
+      "essential": true,
+      "portMappings": [{ "containerPort": 8080, "protocol": "tcp" }],
+      "environment": [
+        { "name": "APP_VERSION", "value": "${APP_VERSION}" },
+        { "name": "DB_IAM_AUTH", "value": "true" },
+        { "name": "DB_HOST", "value": "${DB_PROXY_ENDPOINT}" },
+        { "name": "DB_PORT", "value": "5432" },
+        { "name": "DB_NAME", "value": "${DB_NAME}" },
+        { "name": "DB_USER", "value": "${DB_USER}" },
+        { "name": "REDIS_HOST", "value": "${REDIS_ENDPOINT}" },
+        { "name": "REDIS_PORT", "value": "6379" },
+        { "name": "REDIS_SSL", "value": "true" }
+      ],
+      "secrets": [
+        { "name": "REDIS_PASSWORD", "valueFrom": "${REDIS_SECRET_ARN}:password::" }
+      ],
+      "healthCheck": {
+        "command": ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 90
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/module-6-dev-app",
+          "awslogs-region": "${AWS_REGION}",
+          "awslogs-stream-prefix": "app"
+        }
+      }
+    }
+  ]
+}
